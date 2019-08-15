@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">PcentauryLogin00</string>
+    <string name="action_settings">Settings</string>
+    <string name="registro">Registrarse</string>
+    <string name="login">Login</string>
+    <string name="forgotPassword">Olvidaste tu contraseña?</string>
+    <string name="rememberMe">Recordarme</string>
+    <string name="welcome">Bienvenido</string>
+    <string name="userdatatag">Agrega tus datos para ingresar</string>
+    <string name="newUserData">Agrega tus datos para registrate</string>
+    <string name="userNametag">Nombre de usuario</string>
+    <string name="pswdTag">Contraseña</string>
+    <string name="newUser">Usuario Nuevo?</string>
+    <string name="email">Correo Electrónico</string>
+</resources>
