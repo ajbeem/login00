@@ -21,15 +21,9 @@ public class register extends AppCompatActivity {
     private EditText cmpUser, cmpMail, cmpPswd;
     private Button sendData;
     private RequestQueue requestQueue;
-    private String urlRegistro = "http://127.0.0.1:8887/login_server/php/altaUsuariosJSON.php?";
-    //http://192.168.1.71/login_server/php/altaUsuariosJSON.php?"
-
+    private String urlRegistro = "http://192.168.1.71/login_server/php/altaUsuariosJSON.php?";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
-
         cmpUser = (EditText)findViewById(R.id.etRegisterNuser);
         cmpMail = (EditText)findViewById(R.id.etRegisterUserMail);
         cmpPswd = (EditText)findViewById(R.id.etRegisterPswd);
@@ -41,6 +35,9 @@ public class register extends AppCompatActivity {
                 register();
             }
         });
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_register);
     }
 
     private void register() {
@@ -73,32 +70,5 @@ public class register extends AppCompatActivity {
         Toast savedToast = Toast.makeText(getApplicationContext(),
                 "Enviando datos", Toast.LENGTH_SHORT);
         savedToast.show();
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, urlRegistro, jsonparams, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            if (response.getString("answer").equalsIgnoreCase("registroCorrecto")) {
-                                Toast.makeText(getApplicationContext(), "Usuario Registrado...\n" +"-"+response.getString("message"), Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(getApplicationContext(), "" + response.getString("answer")+"-"+response.getString("message"), Toast.LENGTH_SHORT).show();
-
-                            }
-                        } catch (JSONException e) {
-                            Toast unsavedToast = Toast.makeText(getApplicationContext(),
-                                    "Error Al recibir los Datos, intentalo nuevamente" + e.getMessage(), Toast.LENGTH_LONG);
-                            unsavedToast.show();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                        Toast.makeText(getApplicationContext(), "La comunicación con el servicio ha fallado Intentalo nuevamente" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-        requestQueue.add(jsonObjectRequest);
-
     }
 }
