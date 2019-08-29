@@ -1,5 +1,6 @@
 package com.pcentaury.pcentaurylogin00;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -13,7 +14,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,13 +21,14 @@ public class register extends AppCompatActivity {
     private EditText cmpUser, cmpMail, cmpPswd;
     private Button sendData;
     private RequestQueue requestQueue;
-    private String urlRegistro = "http://192.168.1.71/login_server/php/altaUsuariosJSON.php?";
+    private String urlRegistro = "http://www.aprendiendoandroid.esy.es/php/altaUsuariosJSON.php?";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_register);
         cmpUser = (EditText)findViewById(R.id.etRegisterNuser);
         cmpMail = (EditText)findViewById(R.id.etRegisterUserMail);
         cmpPswd = (EditText)findViewById(R.id.etRegisterPswd);
-
         sendData = (Button)findViewById(R.id.btnRegisterSendData);
         sendData.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -36,8 +37,6 @@ public class register extends AppCompatActivity {
             }
         });
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
     }
 
     private void register() {
@@ -54,7 +53,7 @@ public class register extends AppCompatActivity {
         }
     }
 
-    private void jsonRegisterRequest(String user , String mail, String password) {
+    private void jsonRegisterRequest(final String user , String mail, String password) {
         requestQueue = Volley.newRequestQueue(this);
         JSONObject jsonparams = new JSONObject();
 //nUsuario,  password, correoElectronicoUsuario, usuarioAdministrador
@@ -70,5 +69,34 @@ public class register extends AppCompatActivity {
         Toast savedToast = Toast.makeText(getApplicationContext(),
                 "Enviando datos", Toast.LENGTH_SHORT);
         savedToast.show();
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.POST, urlRegistro, jsonparams, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    if (response.getString("answer").equalsIgnoreCase("registroCorrecto")) {
+                        Toast.makeText(getApplicationContext(), "Usuario...\n"+ user + " Usa tu contraseña para Ingresar... " + response.getString("message"), Toast.LENGTH_SHORT).show();
+                        goLogin();
+                    }else{
+                        Toast.makeText(getApplicationContext(), "ERROR: \n"+response.getString("answer")+response.getString("message"),Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException jsonE) {
+                    Toast.makeText(getApplicationContext(), "Algo ha ido Mal...\n" + "-" + jsonE.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), "Error al conectarse con el servicio...\n"+"-"+error.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    private void goLogin() {
+        Intent goStart = new Intent(this, MainActivity.class);
+        startActivity(goStart);
     }
 }

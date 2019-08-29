@@ -1,3 +1,8 @@
+//  MainActivity.java
+//  Project:    Saa
+//  Created by SDE. Alfredo Jiménez Miguel on 08/07/19.
+//  Copyright © 2019 com.pcentaury All rights reserved.
+//
 package com.pcentaury.pcentaurylogin00;
 
 import android.app.DownloadManager;
@@ -16,6 +21,8 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -23,20 +30,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
-    EditText userName, pass;
+    EditText etUserName, etPass;
     Button registrarNuevousuario;
     private RequestQueue queue;
-    String urlLogin="";
-
-
+    private String url_login = "http://www.diot.esy.es/php/usersLoginJSON.php?";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        userName = (EditText)findViewById(R.id.etNuser);
-        pass = (EditText)findViewById(R.id.etPswd);
+        etUserName = (EditText)findViewById(R.id.etNuser);
+        etPass = (EditText)findViewById(R.id.etPswd);
         registrarNuevousuario= (Button)findViewById(R.id.btnMainRegister);
         registrarNuevousuario.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,44 +70,53 @@ public class MainActivity extends AppCompatActivity {
     private void login() {
         if(Services.NetworkConnection(this)){
             //TO-DO
-            if(userName.getText().toString().isEmpty() || pass.getText().toString().isEmpty()){
+            if(etUserName.getText().toString().isEmpty() || etPass.getText().toString().isEmpty()){
                 Toast.makeText(getApplicationContext(), "Por favor llena todos los campos \n y vuelve a intentarlo!!", Toast.LENGTH_LONG).show();
             }else{
-                jsonRequest(userName.getText().toString(), pass.getText().toString());
+               // loginRequest(userName.getText().toString(), pass.getText().toString());
+                autenticarUser();
             }
 
         }else {
             Toast.makeText(getApplicationContext(), "Verifica tu conexión a internet e intentalo nuevamente", Toast.LENGTH_LONG).show();
         }
     }
-
-    private void jsonRequest(String usuario, String pasword) {
-        queue = Volley.newRequestQueue(this);
-
-        JSONObject jsonparams = new JSONObject();
+    /*
+            JSONObject jsonparams = new JSONObject();
 
         try {
             jsonparams.put("nUsuario", usuario);
-            jsonparams.put("pswd", pasword);
+            jsonparams.put("password", pasword);
+            //nUsuario, password
         } catch (JSONException e) {
             Toast.makeText(getApplicationContext(),"Excepcion capturada: \n"+ e.getMessage(),Toast.LENGTH_LONG ).show();
             //e.printStackTrace();
         }
+    * */
 
+    private void autenticarUser() {
+        queue = Volley.newRequestQueue(this);
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("nUsuario", etUserName.getText().toString());
+            jsonParams.put("pswd", etPass.getText().toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Toast savedToast = Toast.makeText(getApplicationContext(),
                 "Enviando datos", Toast.LENGTH_SHORT);
         savedToast.show();
 
-        /*JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, urlLogin, jsonparams, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, url_login, jsonParams, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
                             if (response.getString("answer").equalsIgnoreCase("ok")) {
-                                Toast.makeText(getApplicationContext(), "Usuario Autenticado", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Bienvenido"+ response.getString("user"),Toast.LENGTH_LONG).show();
+                                //startMainActivity(response.getString("user"));
                             } else {
-                                Toast.makeText(getApplicationContext(), "" + response.getString("answer"), Toast.LENGTH_SHORT).show();
-
+                                Toast.makeText(getApplicationContext(),"" + response.getString("answer"),Toast.LENGTH_LONG).show();
                             }
                         } catch (JSONException e) {
                             Toast unsavedToast = Toast.makeText(getApplicationContext(),
@@ -118,10 +132,17 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "La comunicación con el servicio ha fallado Intentalo nuevamente" + error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-        queue.add(jsonObjectRequest);*/
-
-
+        queue.add(jsonObjectRequest);
     }
+
+    private void startMainActivity(String user) {
+        Intent goN = new Intent(this, MainActivity.class);
+        goN.putExtra("userName", user);
+        startActivity(goN);
+        this.finish();
+    }
+
+    private void startActivity (Class actividad){new Intent (this , actividad);}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -144,4 +165,6 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }
